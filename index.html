@@ -1,123 +1,216 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retorno Módulos - ANAM</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#6A0F49">
-    
-    <style>
-        /* (Se mantiene tu CSS original...) */
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f1f1f1; padding: 20px; }
-        .container { background: white; padding: 30px; max-width: 800px; margin: auto; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.08); border-top: 8px solid #6A0F49; }
-        .header { text-align: center; margin-bottom: 20px; }
-        .header img { max-height: 80px; }
-        .header h2 { color: #6A0F49; margin-top: 10px; }
-        .info { background: #f7f7f7; padding: 12px; border-left: 4px solid #6A0F49; margin-bottom: 20px; }
-        label { font-weight: 600; color: #333; }
-        select, textarea, input { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 18px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; }
-        button { background-color: #6A0F49; color: white; padding: 12px; border: none; width: 100%; cursor: pointer; font-size: 16px; border-radius: 4px; }
-        button:hover { background-color: #4e0b36; }
-        .hidden { display: none; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formulario de Retorno - ANAM</title>
+
+<style>
+body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f1f1f1; padding: 20px; }
+.container { background: white; padding: 30px; max-width: 800px; margin: auto; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.08); border-top: 8px solid #6A0F49; transition: 0.3s; }
+.header { text-align: center; margin-bottom: 20px; }
+.header h2 { margin-top: 10px; }
+.info { background: #f7f7f7; padding: 12px; border-left: 4px solid #6A0F49; margin-bottom: 20px; }
+label { font-weight: 600; color: #333; }
+select, textarea, input { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 18px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; }
+button { background-color: #6A0F49; color: white; padding: 12px; border: none; width: 100%; cursor: pointer; font-size: 16px; border-radius: 4px; margin-top: 10px; }
+.modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+.modal-content { background-color: white; margin: 20% auto; padding: 25px; border-radius: 8px; width: 90%; max-width: 400px; text-align: center; }
+.btn-secondary { background-color: #0078d4; }
+.hidden { display: none; }
+.error { border: 2px solid red; }
+</style>
 </head>
+
 <body>
 
-<div class="container">
-    <div class="header">
-        <img src="logo.png" alt="Logo ANAM">
-        <h2>Formulario de Retornos Módulos</h2>
-    </div>
+<div class="container" id="container">
+<div class="header">
+<h2 id="titulo">Formulario Institucional de Retorno</h2>
+</div>
 
-    <div class="info">
-        <strong>Folio:</strong> <span id="folio"></span><br>
-        <strong>Fecha y Hora:</strong> <span id="fechaHora"></span>
-    </div>
+<div class="info" id="infoBox">
+<strong>Folio:</strong> <span id="folio"></span><br>
+<strong>Fecha y Hora:</strong> <span id="fechaHora"></span>
+</div>
 
-    <form id="formRetorno">
-        <label>Nombre del Operador en Turno:</label>
-        <input type="text" id="operador" placeholder="Ingrese su nombre completo" required>
+<form id="formRetorno">
 
-        <label>Seleccione una opción:</label>
-        <select id="tipo" required>
-            <option value="">-- Seleccione --</option>
-            <option>Retorno Para Nueva Exploración</option>
-            <option>Retorno Fuera De Horario</option>
-            <option>Retorno Sin Servicio Extraordinario</option>
-            <option>Retorno Por Equivocación de Carril</option>
-            <option>Solicitud de Revisión De Mercancía Sobre-Dimensionada</option>
-        </select>
+<label>Tipo de Operación:</label>
+<select id="operacion" required>
+<option value="">-- Seleccione --</option>
+<option value="Importación">Importación</option>
+<option value="Exportación">Exportación</option>
+</select>
 
-        <label>Placa(s) del vehículo:</label>
-        <textarea id="placas" placeholder="Ej: ABC-123, XYZ-789" required></textarea>
+<label>Nombre del Operador en Turno:</label>
+<input type="text" id="operador" required>
 
-        <div id="mercanciaDiv" class="hidden">
-            <label>Tipo de Mercancía / Descripción:</label>
-            <textarea id="mercancia"></textarea>
-        </div>
+<label>Tipo de Retorno:</label>
+<select id="tipo" required>
+<option value="">-- Seleccione --</option>
+<option>Retorno Para Nueva Exploración</option>
+<option>Retorno Fuera De Horario</option>
+<option>Retorno Sin Servicio Extraordinario</option>
+<option>Retorno Por Equivocación de Carril</option>
+<option>Solicitud de Revisión De Mercancía Sobre-Dimensionada</option>
+</select>
 
-        <button type="submit">Generar Correo de Retorno</button>
-    </form>
+<label>Placa(s) del vehículo:</label>
+<textarea id="placas" required></textarea>
+
+<div id="mercanciaDiv" class="hidden">
+<label>Tipo de Mercancía / Descripción:</label>
+<textarea id="mercancia"></textarea>
+</div>
+
+<button type="submit">Preparar Envío</button>
+
+</form>
+</div>
+
+<div id="selectorModal" class="modal">
+<div class="modal-content">
+<h3>¿Cómo deseas enviar el correo?</h3>
+<button onclick="enviarCorreo('app')">Abrir App de Outlook</button>
+<button class="btn-secondary" onclick="enviarCorreo('web')">Abrir Outlook Web</button>
+<button style="background:none;color:#555;" onclick="cerrarModal()">Cancelar</button>
+</div>
 </div>
 
 <script>
-    // Registro del Service Worker para PWA
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js');
-        });
-    }
 
-    // --- Lógica de Folios y Fecha ---
-    function inicializarFolio() {
-        const hoy = new Date();
-        const fechaBase = hoy.getFullYear().toString() + ("0" + (hoy.getMonth()+1)).slice(-2) + ("0" + hoy.getDate()).slice(-2);
-        let contador = localStorage.getItem("contador_" + fechaBase) || 0;
-        document.getElementById("folio").textContent = "RET-" + fechaBase + "-" + String(parseInt(contador)+1).padStart(3,'0');
-    }
+let datosCorreo = {};
 
-    function generarFolio() {
-        const hoy = new Date();
-        const fechaBase = hoy.getFullYear().toString() + ("0" + (hoy.getMonth()+1)).slice(-2) + ("0" + hoy.getDate()).slice(-2);
-        let contador = parseInt(localStorage.getItem("contador_" + fechaBase) || 0) + 1;
-        localStorage.setItem("contador_" + fechaBase, contador);
-        return "RET-" + fechaBase + "-" + String(contador).padStart(3,'0');
-    }
+function inicializarFolio() {
+const hoy = new Date();
+const fechaBase = hoy.getFullYear().toString() +
+("0" + (hoy.getMonth()+1)).slice(-2) +
+("0" + hoy.getDate()).slice(-2);
 
-    function actualizarFechaHora() {
-        document.getElementById("fechaHora").textContent = new Date().toLocaleString();
-    }
+let contador = localStorage.getItem("contador_" + fechaBase) || 0;
 
-    setInterval(actualizarFechaHora, 1000);
-    actualizarFechaHora();
-    inicializarFolio();
+document.getElementById("folio").textContent =
+"RET-" + fechaBase + "-" +
+String(parseInt(contador)+1).padStart(3,'0');
+}
 
-    document.getElementById("tipo").addEventListener("change", function() {
-        document.getElementById("mercanciaDiv").classList.toggle("hidden", this.value !== "Solicitud de Revisión De Mercancía Sobre-Dimensionada");
-    });
+function generarFolio() {
+const hoy = new Date();
+const fechaBase = hoy.getFullYear().toString() +
+("0" + (hoy.getMonth()+1)).slice(-2) +
+("0" + hoy.getDate()).slice(-2);
 
-    document.getElementById("formRetorno").addEventListener("submit", function(e) {
-        e.preventDefault();
-        const operador = document.getElementById("operador").value.trim();
-        const tipo = document.getElementById("tipo").value;
-        const placas = document.getElementById("placas").value.trim().replace(/,/g, '\n').replace(/\s+/g, '\n');
-        const mercancia = document.getElementById("mercancia").value.trim();
-        const folio = generarFolio();
+let contador = parseInt(localStorage.getItem("contador_" + fechaBase) || 0) + 1;
+localStorage.setItem("contador_" + fechaBase, contador);
 
-        let cuerpo = `FOLIO: ${folio}\nFecha: ${document.getElementById("fechaHora").textContent}\nOperador: ${operador}\n\nTipo: ${tipo}\n\nPlacas:\n${placas}`;
-        if (mercancia) cuerpo += `\n\nMercancía:\n${mercancia}`;
+return "RET-" + fechaBase + "-" +
+String(contador).padStart(3,'0');
+}
 
-        const destinatarios = "jorge.silva@anam.gob.mx;vyc.altamira@anam.gob.mx;alejandra.munoz@anam.gob.mx;nayely.chavez@anam.gob.mx;miguel.herrera@anam.gob.mx;abraham.gomez@anam.gob.mx;daniel.santosh@anam.gob.mx;christian.monrreal@anam.gob.mx;monica.becerra@anam.gob.mx;anahi.santiago@anam.gob.mx";
-        const mailtoLink = `https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(destinatarios)}&subject=${encodeURIComponent(tipo + " - " + folio)}&body=${encodeURIComponent(cuerpo)}`;
+setInterval(() => {
+document.getElementById("fechaHora").textContent =
+new Date().toLocaleString();
+}, 1000);
 
-        window.open(mailtoLink, '_blank');
-        this.reset();
-        inicializarFolio();
-    });
+inicializarFolio();
+
+/* 🔠 Convertir placas automáticamente a MAYÚSCULAS */
+document.getElementById("placas").addEventListener("input", function() {
+this.value = this.value.toUpperCase();
+});
+
+/* 🎨 Cambiar color según tipo de operación */
+document.getElementById("operacion").addEventListener("change", function() {
+
+const container = document.getElementById("container");
+const infoBox = document.getElementById("infoBox");
+
+if (this.value === "Importación") {
+container.style.borderTop = "8px solid #1E8449";
+infoBox.style.borderLeft = "4px solid #1E8449";
+}
+else if (this.value === "Exportación") {
+container.style.borderTop = "8px solid #1F618D";
+infoBox.style.borderLeft = "4px solid #1F618D";
+}
+else {
+container.style.borderTop = "8px solid #6A0F49";
+infoBox.style.borderLeft = "4px solid #6A0F49";
+}
+
+});
+
+document.getElementById("tipo").addEventListener("change", function() {
+document.getElementById("mercanciaDiv")
+.classList.toggle("hidden",
+this.value !== "Solicitud de Revisión De Mercancía Sobre-Dimensionada");
+});
+
+document.getElementById("formRetorno")
+.addEventListener("submit", function(e) {
+
+e.preventDefault();
+
+/* 🔒 Validar que seleccionó Importación o Exportación */
+const operacion = document.getElementById("operacion");
+if (operacion.value === "") {
+alert("Debe seleccionar Importación o Exportación.");
+operacion.classList.add("error");
+return;
+} else {
+operacion.classList.remove("error");
+}
+
+datosCorreo = {
+operacion: operacion.value,
+operador: document.getElementById("operador").value.trim(),
+tipo: document.getElementById("tipo").value,
+placas: document.getElementById("placas").value.trim(),
+mercancia: document.getElementById("mercancia").value.trim(),
+folio: generarFolio(),
+fecha: document.getElementById("fechaHora").textContent
+};
+
+document.getElementById("selectorModal").style.display = "block";
+});
+
+function enviarCorreo(metodo) {
+
+const principal = "jorge.silva@anam.gob.mx";
+const copia = "vyc.altamira@anam.gob.mx,alejandra.munoz@anam.gob.mx,nayely.chavez@anam.gob.mx,miguel.herrera@anam.gob.mx,abraham.gomez@anam.gob.mx,daniel.santosh@anam.gob.mx,christian.monrreal@anam.gob.mx,monica.becerra@anam.gob.mx,anahi.santiago@anam.gob.mx";
+
+const asunto = `${datosCorreo.operacion} - ${datosCorreo.tipo}`;
+
+const cuerpo = `FOLIO: ${datosCorreo.folio}
+Fecha: ${datosCorreo.fecha}
+Tipo de Operación: ${datosCorreo.operacion}
+Operador: ${datosCorreo.operador}
+
+Tipo de Retorno:
+${datosCorreo.tipo}
+
+Placas:
+${datosCorreo.placas}${datosCorreo.mercancia ? '\n\nMercancía:\n' + datosCorreo.mercancia : ''}`;
+
+if (metodo === 'app') {
+window.location.href =
+`mailto:${principal}?cc=${encodeURIComponent(copia)}&subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+} else {
+window.location.href =
+`https://outlook.office.com/mail/?path=/mail/action/compose&to=${encodeURIComponent(principal)}&cc=${encodeURIComponent(copia)}&subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+}
+
+cerrarModal();
+document.getElementById("formRetorno").reset();
+inicializarFolio();
+}
+
+function cerrarModal() {
+document.getElementById("selectorModal").style.display = "none";
+}
+
 </script>
+
 </body>
 </html>
-
-
-
