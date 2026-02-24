@@ -178,30 +178,42 @@ document.getElementById("selectorModal").style.display = "block";
 function enviarCorreo(metodo) {
 
 const principal = "jorge.silva@anam.gob.mx";
+
 const copia = "vyc.altamira@anam.gob.mx,alejandra.munoz@anam.gob.mx,nayely.chavez@anam.gob.mx,miguel.herrera@anam.gob.mx,abraham.gomez@anam.gob.mx,daniel.santosh@anam.gob.mx,christian.monrreal@anam.gob.mx,monica.becerra@anam.gob.mx,anahi.santiago@anam.gob.mx";
 
-const asunto = `${datosCorreo.operacion} - ${datosCorreo.tipo}`;
+const asunto = datosCorreo.operacion + " - " + datosCorreo.tipo;
 
-const cuerpo = `FOLIO: ${datosCorreo.folio}
-Fecha: ${datosCorreo.fecha}
-Tipo de Operación: ${datosCorreo.operacion}
-Operador: ${datosCorreo.operador}
+const cuerpo =
+"FOLIO: " + datosCorreo.folio + "\r\n" +
+"Fecha: " + datosCorreo.fecha + "\r\n" +
+"Tipo de Operación: " + datosCorreo.operacion + "\r\n" +
+"Operador: " + datosCorreo.operador + "\r\n\r\n" +
+"Tipo de Retorno:\r\n" + datosCorreo.tipo + "\r\n\r\n" +
+"Placas:\r\n" + datosCorreo.placas +
+(datosCorreo.mercancia ? "\r\n\r\nMercancía:\r\n" + datosCorreo.mercancia : "");
 
-Tipo de Retorno:
-${datosCorreo.tipo}
+if (metodo === "app") {
 
-Placas:
-${datosCorreo.placas}${datosCorreo.mercancia ? '\n\nMercancía:\n' + datosCorreo.mercancia : ''}`;
+    // Outlook escritorio
+    window.location.href =
+    "mailto:" + principal +
+    "?cc=" + encodeURIComponent(copia) +
+    "&subject=" + encodeURIComponent(asunto) +
+    "&body=" + encodeURIComponent(cuerpo);
 
-if (metodo === 'app') {
-window.location.href =
-`mailto:${principal}?cc=${encodeURIComponent(copia)}&subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
 } else {
-window.location.href =
-`https://outlook.office.com/mail/?path=/mail/action/compose&to=${encodeURIComponent(principal)}&cc=${encodeURIComponent(copia)}&subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+
+    // Outlook Web (ruta correcta y actual)
+    window.location.href =
+    "https://outlook.office.com/mail/?path=/mail/action/compose" +
+    "&to=" + encodeURIComponent(principal) +
+    "&cc=" + encodeURIComponent(copia) +
+    "&subject=" + encodeURIComponent(asunto) +
+    "&body=" + encodeURIComponent(cuerpo);
 }
 
 cerrarModal();
+}
 document.getElementById("formRetorno").reset();
 inicializarFolio();
 }
@@ -214,3 +226,4 @@ document.getElementById("selectorModal").style.display = "none";
 
 </body>
 </html>
+
