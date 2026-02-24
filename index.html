@@ -11,7 +11,7 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background:#f1f1f1; padding:2
 .container {
     background:white;
     padding:30px;
-    max-width:900px;
+    max-width:800px;
     margin:auto;
     border-radius:8px;
     box-shadow:0 0 20px rgba(0,0,0,0.08);
@@ -37,6 +37,7 @@ select, textarea, input {
     margin-bottom:18px;
     border-radius:4px;
     border:1px solid #ccc;
+    box-sizing:border-box;
 }
 
 button {
@@ -65,6 +66,7 @@ button:hover { background:#4e0b36; }
     display:flex;
     justify-content:center;
     align-items:center;
+    z-index:1000;
 }
 
 .modal-content {
@@ -78,33 +80,6 @@ button:hover { background:#4e0b36; }
 .modal-content button { margin-bottom:10px; }
 
 .cancelar { background:#999; }
-
-/* Historial */
-.historial {
-    margin-top:40px;
-}
-
-table {
-    width:100%;
-    border-collapse:collapse;
-    font-size:14px;
-}
-
-th, td {
-    border:1px solid #ddd;
-    padding:8px;
-    text-align:left;
-}
-
-th {
-    background:#6A0F49;
-    color:white;
-}
-
-.btn-limpiar {
-    background:#999;
-    margin-top:10px;
-}
 </style>
 </head>
 
@@ -151,28 +126,8 @@ th {
 </div>
 
 <button type="submit">Generar Correo de Retorno</button>
+
 </form>
-
-<!-- HISTORIAL -->
-<div class="historial">
-<h3>Historial de Folios Generados</h3>
-<table>
-<thead>
-<tr>
-<th>Folio</th>
-<th>Fecha</th>
-<th>Operador</th>
-<th>Operación</th>
-<th>Tipo</th>
-<th>Placas</th>
-</tr>
-</thead>
-<tbody id="tablaHistorial"></tbody>
-</table>
-
-<button class="btn-limpiar" onclick="limpiarHistorial()">Limpiar Historial</button>
-</div>
-
 </div>
 
 <!-- MODAL -->
@@ -195,16 +150,25 @@ actualizarFechaHora();
 
 function inicializarFolio(){
 const hoy=new Date();
-const base=hoy.getFullYear().toString()+("0"+(hoy.getMonth()+1)).slice(-2)+("0"+hoy.getDate()).slice(-2);
+const base=hoy.getFullYear().toString()
++("0"+(hoy.getMonth()+1)).slice(-2)
++("0"+hoy.getDate()).slice(-2);
+
 let contador=localStorage.getItem("contador_"+base)||0;
-document.getElementById("folio").textContent="RET-"+base+"-"+String(parseInt(contador)+1).padStart(3,'0');
+
+document.getElementById("folio").textContent=
+"RET-"+base+"-"+String(parseInt(contador)+1).padStart(3,'0');
 }
 
 function generarFolio(){
 const hoy=new Date();
-const base=hoy.getFullYear().toString()+("0"+(hoy.getMonth()+1)).slice(-2)+("0"+hoy.getDate()).slice(-2);
+const base=hoy.getFullYear().toString()
++("0"+(hoy.getMonth()+1)).slice(-2)
++("0"+hoy.getDate()).slice(-2);
+
 let contador=parseInt(localStorage.getItem("contador_"+base)||0)+1;
 localStorage.setItem("contador_"+base,contador);
+
 return "RET-"+base+"-"+String(contador).padStart(3,'0');
 }
 
@@ -212,57 +176,63 @@ inicializarFolio();
 
 document.getElementById("tipo").addEventListener("change",function(){
 document.getElementById("mercanciaDiv")
-.classList.toggle("hidden",this.value!=="Solicitud de Revisión De Mercancía Sobre-Dimensionada");
+.classList.toggle("hidden",
+this.value!=="Solicitud de Revisión De Mercancía Sobre-Dimensionada");
 });
 
-let datosCorreo={};
-let registroActual={};
+/* 🔠 Convertir placas automáticamente a MAYÚSCULAS */
+document.getElementById("placas").addEventListener("input", function(){
+this.value = this.value.toUpperCase();
+});
+
+let datosTemporales={};
 
 document.getElementById("formRetorno").addEventListener("submit",function(e){
 e.preventDefault();
 
-const operador=document.getElementById("operador").value.trim();
-const operacion=document.getElementById("operacion").value;
-const tipo=document.getElementById("tipo").value;
-const placas=document.getElementById("placas").value.trim();
-const mercancia=document.getElementById("mercancia").value.trim();
-
-const folio=generarFolio();
-const fecha=new Date().toLocaleString();
-
-let cuerpo=`FOLIO: ${folio}
-Fecha: ${fecha}
-Operador: ${operador}
-Operación: ${operacion}
-
-Tipo: ${tipo}
-
-Placas:
-${placas}`;
-
-if(mercancia){
-cuerpo+=`\n\nMercancía:\n${mercancia}`;
-}
-
-const destinatarios="jorge.silva@anam.gob.mx";
-const asunto=`${operacion} - ${tipo}`;
-
-datosCorreo.web=`https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(destinatarios)}&subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
-datosCorreo.app=`mailto:${destinatarios}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
-
-registroActual={folio,fecha,operador,operacion,tipo,placas};
+datosTemporales.operador=document.getElementById("operador").value.trim();
+datosTemporales.operacion=document.getElementById("operacion").value;
+datosTemporales.tipo=document.getElementById("tipo").value;
+datosTemporales.placas=document.getElementById("placas").value.trim()
+.replace(/,/g,'\n')
+.replace(/\s+/g,'\n');
+datosTemporales.mercancia=document.getElementById("mercancia").value.trim();
 
 document.getElementById("modalEnvio").classList.remove("hidden");
 });
 
-function enviarCorreo(tipo){
-if(tipo==="web"){
-window.location.href=datosCorreo.web;
-}else{
-window.location.href=datosCorreo.app;
+function enviarCorreo(metodo){
+
+const folio=generarFolio(); // 🔒 Se genera SOLO aquí
+const fecha=new Date().toLocaleString();
+
+let cuerpo=`FOLIO: ${folio}
+Fecha: ${fecha}
+Operador: ${datosTemporales.operador}
+Operación: ${datosTemporales.operacion}
+
+Tipo: ${datosTemporales.tipo}
+
+Placas:
+${datosTemporales.placas}`;
+
+if(datosTemporales.mercancia){
+cuerpo+=`\n\nMercancía:\n${datosTemporales.mercancia}`;
 }
 
-guardarRegistro(registroActual);
+const destinatarios="jorge.silva@anam.gob.mx";
+const asunto=`${datosTemporales.operacion} - ${datosTemporales.tipo}`;
+
+let enlace;
+
+if(metodo==="web"){
+enlace=`https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(destinatarios)}&subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+}else{
+enlace=`mailto:${destinatarios}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+}
+
+window.location.href=enlace;
+
 cerrarModal();
 document.getElementById("formRetorno").reset();
 inicializarFolio();
@@ -271,38 +241,6 @@ inicializarFolio();
 function cerrarModal(){
 document.getElementById("modalEnvio").classList.add("hidden");
 }
-
-function guardarRegistro(reg){
-let historial=JSON.parse(localStorage.getItem("historialRetornos"))||[];
-historial.unshift(reg);
-localStorage.setItem("historialRetornos",JSON.stringify(historial));
-cargarHistorial();
-}
-
-function cargarHistorial(){
-let historial=JSON.parse(localStorage.getItem("historialRetornos"))||[];
-let tabla=document.getElementById("tablaHistorial");
-tabla.innerHTML="";
-historial.forEach(r=>{
-tabla.innerHTML+=`<tr>
-<td>${r.folio}</td>
-<td>${r.fecha}</td>
-<td>${r.operador}</td>
-<td>${r.operacion}</td>
-<td>${r.tipo}</td>
-<td>${r.placas}</td>
-</tr>`;
-});
-}
-
-function limpiarHistorial(){
-if(confirm("¿Desea eliminar todo el historial?")){
-localStorage.removeItem("historialRetornos");
-cargarHistorial();
-}
-}
-
-cargarHistorial();
 
 </script>
 
