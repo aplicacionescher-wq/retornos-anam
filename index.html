@@ -26,7 +26,7 @@ button { background-color: #6A0F49; color: white; padding: 12px; border: none; w
 
 <div class="container" id="container">
 <div class="header">
-<h2>Formulario Institucional de Retorno</h2>
+<h2>Retornos Módulos de Exportación e Importación</h2>
 </div>
 
 <div class="info" id="infoBox">
@@ -175,8 +175,8 @@ document.getElementById("selectorModal").style.display = "block";
 
 function enviarCorreo(metodo) {
 
-const principal = "jorge.silva@anam.gob.mx";
-const copia = "vyc.altamira@anam.gob.mx,alejandra.munoz@anam.gob.mx,nayely.chavez@anam.gob.mx,miguel.herrera@anam.gob.mx,abraham.gomez@anam.gob.mx,daniel.santosh@anam.gob.mx,christian.monrreal@anam.gob.mx,monica.becerra@anam.gob.mx,anahi.santiago@anam.gob.mx";
+const principal = "jorge.silva@anam.gob.mx;vyc.altamira@anam.gob.mx,"
+const copia = "alejandra.munoz@anam.gob.mx,nayely.chavez@anam.gob.mx,miguel.herrera@anam.gob.mx,abraham.gomez@anam.gob.mx,daniel.santosh@anam.gob.mx,christian.monrreal@anam.gob.mx,monica.becerra@anam.gob.mx,anahi.santiago@anam.gob.mx";
 
 const asunto = datosCorreo.operacion + " - " + datosCorreo.tipo;
 
@@ -220,3 +220,4 @@ document.getElementById("selectorModal").style.display = "none";
 
 </body>
 </html>
+
