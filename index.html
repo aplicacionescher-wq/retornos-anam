@@ -8,7 +8,6 @@
     <meta name="theme-color" content="#6A0F49">
     
     <style>
-        /* (Se mantiene tu CSS original...) */
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f1f1f1; padding: 20px; }
         .container { background: white; padding: 30px; max-width: 800px; margin: auto; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.08); border-top: 8px solid #6A0F49; }
         .header { text-align: center; margin-bottom: 20px; }
@@ -62,14 +61,13 @@
 </div>
 
 <script>
-    // Registro del Service Worker para PWA
+    // Registro del Service Worker
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js');
         });
     }
 
-    // --- Lógica de Folios y Fecha ---
     function inicializarFolio() {
         const hoy = new Date();
         const fechaBase = hoy.getFullYear().toString() + ("0" + (hoy.getMonth()+1)).slice(-2) + ("0" + hoy.getDate()).slice(-2);
@@ -99,20 +97,40 @@
 
     document.getElementById("formRetorno").addEventListener("submit", function(e) {
         e.preventDefault();
+        
         const operador = document.getElementById("operador").value.trim();
         const tipo = document.getElementById("tipo").value;
-        const placas = document.getElementById("placas").value.trim().replace(/,/g, '\n').replace(/\s+/g, '\n');
+        const placasRaw = document.getElementById("placas").value.trim();
         const mercancia = document.getElementById("mercancia").value.trim();
+        
+        // Limpiar y formatear placas con saltos de línea
+        const placas = placasRaw.replace(/,/g, '\n').replace(/\s+/g, '\n');
+        
         const folio = generarFolio();
+        const fechaActual = document.getElementById("fechaHora").textContent;
 
-        let cuerpo = `FOLIO: ${folio}\nFecha: ${document.getElementById("fechaHora").textContent}\nOperador: ${operador}\n\nTipo: ${tipo}\n\nPlacas:\n${placas}`;
-        if (mercancia) cuerpo += `\n\nMercancía:\n${mercancia}`;
+        // Construcción del cuerpo del correo
+        let cuerpo = `FOLIO: ${folio}%0D%0A`;
+        cuerpo += `Fecha: ${fechaActual}%0D%0A`;
+        cuerpo += `Operador: ${operador}%0D%0A%0D%0A`;
+        cuerpo += `Tipo de Solicitud:%0D%0A${tipo}%0D%0A%0D%0A`;
+        cuerpo += `Placa(s):%0D%0A${placas}`;
+        
+        if (tipo === "Solicitud de Revisión De Mercancía Sobre-Dimensionada") {
+            cuerpo += `%0D%0A%0D%0A- Mercancía:%0D%0A${mercancia}`;
+        }
 
         const destinatarios = "jorge.silva@anam.gob.mx;vyc.altamira@anam.gob.mx;alejandra.munoz@anam.gob.mx;nayely.chavez@anam.gob.mx;miguel.herrera@anam.gob.mx;abraham.gomez@anam.gob.mx;daniel.santosh@anam.gob.mx;christian.monrreal@anam.gob.mx;monica.becerra@anam.gob.mx;anahi.santiago@anam.gob.mx";
-        const mailtoLink = `https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(destinatarios)}&subject=${encodeURIComponent(tipo + " - " + folio)}&body=${encodeURIComponent(cuerpo)}`;
+        
+        // Enlace universal mailto (Funciona en PC y Celular)
+        const mailtoLink = `mailto:${destinatarios}?subject=${encodeURIComponent(tipo + " - " + folio)}&body=${cuerpo}`;
 
-        window.open(mailtoLink, '_blank');
+        // Abrir aplicación de correo
+        window.location.href = mailtoLink;
+
+        // Reiniciar formulario
         this.reset();
+        document.getElementById("mercanciaDiv").classList.add("hidden");
         inicializarFolio();
     });
 </script>
