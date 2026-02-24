@@ -66,16 +66,6 @@
     </form>
 </div>
 
-<div id="selectorModal" class="modal">
-    <div class="modal-content">
-        <h3>¿Cómo deseas enviar el correo?</h3>
-        <p>Elige el método que tengas configurado en este dispositivo:</p>
-        <button class="btn-option" onclick="enviarCorreo('app')">Abrir App de Outlook</button>
-        <button class="btn-option btn-secondary" onclick="enviarCorreo('web')">Abrir Outlook Web</button>
-        <button style="background:none; border:none; color: gray; margin-top:15px; cursor:pointer;" onclick="cerrarModal()">Cancelar</button>
-    </div>
-</div>
-
 <script>
     // Registro del Service Worker para PWA
     if ('serviceWorker' in navigator) {
@@ -154,4 +144,5 @@ function enviarCorreo(metodo) {
 </script>
 </body>
 </html>
+
 
