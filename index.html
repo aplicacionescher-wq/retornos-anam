@@ -121,25 +121,32 @@
         document.getElementById("selectorModal").style.display = "block";
     });
 
-    function enviarCorreo(metodo) {
-        const destinatarios = "jorge.silva@anam.gob.mx;vyc.altamira@anam.gob.mx;alejandra.munoz@anam.gob.mx;nayely.chavez@anam.gob.mx;miguel.herrera@anam.gob.mx;abraham.gomez@anam.gob.mx;daniel.santosh@anam.gob.mx;christian.monrreal@anam.gob.mx;monica.becerra@anam.gob.mx;anahi.santiago@anam.gob.mx";
-        const asunto = `${datosCorreo.tipo} - ${datosCorreo.folio}`;
-        const cuerpo = `FOLIO: ${datosCorreo.folio}\nFecha: ${datosCorreo.fecha}\nOperador: ${datosCorreo.operador}\n\nTipo:\n${datosCorreo.tipo}\n\nPlacas:\n${datosCorreo.placas}${datosCorreo.mercancia ? '\n\nMercancía:\n' + datosCorreo.mercancia : ''}`;
+function enviarCorreo(metodo) {
+    const destinatarios = "jorge.silva@anam.gob.mx;vyc.altamira@anam.gob.mx;alejandra.munoz@anam.gob.mx;nayely.chavez@anam.gob.mx;miguel.herrera@anam.gob.mx;abraham.gomez@anam.gob.mx;daniel.santosh@anam.gob.mx;christian.monrreal@anam.gob.mx;monica.becerra@anam.gob.mx;anahi.santiago@anam.gob.mx";
+    const asunto = `${datosCorreo.tipo} - ${datosCorreo.folio}`;
+    const cuerpo = `FOLIO: ${datosCorreo.folio}\nFecha: ${datosCorreo.fecha}\nOperador: ${datosCorreo.operador}\n\nTipo:\n${datosCorreo.tipo}\n\nPlacas:\n${datosCorreo.placas}${datosCorreo.mercancia ? '\n\nMercancía:\n' + datosCorreo.mercancia : ''}`;
 
-        if (metodo === 'app') {
-            // mailto: invoca la aplicación instalada
-            window.location.href = `mailto:${destinatarios}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
-        } else {
-            // Enlace profundo para Outlook Web
-            const webLink = `https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(destinatarios)}&subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
-            window.open(webLink, '_blank');
-        }
+    if (metodo === 'app') {
+        // Opción para App instalada (mailto)
+        window.location.href = `mailto:${destinatarios}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+    } else {
+        // Opción para Outlook Web optimizada para móvil
+        // Usamos la ruta /mail/0/deeplink/compose que es más robusta
+        const baseUrl = "https://outlook.office.com/mail/deeplink/compose";
+        const params = `?to=${encodeURIComponent(destinatarios)}&subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+        
+        // Abrimos en la misma ventana para evitar que el bloqueador de pop-ups del celular interfiera
+        window.location.href = baseUrl + params;
+    }
 
-        cerrarModal();
+    cerrarModal();
+    // Opcional: No resetear el formulario inmediatamente en web por si el usuario debe regresar
+    setTimeout(() => {
         document.getElementById("formRetorno").reset();
         document.getElementById("mercanciaDiv").classList.add("hidden");
         inicializarFolio();
-    }
+    }, 1000);
+}
 
     function cerrarModal() {
         document.getElementById("selectorModal").style.display = "none";
@@ -147,3 +154,4 @@
 </script>
 </body>
 </html>
+
