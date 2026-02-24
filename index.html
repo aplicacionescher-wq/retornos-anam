@@ -177,8 +177,9 @@ document.getElementById("selectorModal").style.display = "block";
 
 function enviarCorreo(metodo) {
 
-const principal = "jorge.silva@anam.gob.mx;vyc.altamira@anam.gob.mx,"
-const copia = "alejandra.munoz@anam.gob.mx,nayely.chavez@anam.gob.mx,miguel.herrera@anam.gob.mx,abraham.gomez@anam.gob.mx,daniel.santosh@anam.gob.mx,christian.monrreal@anam.gob.mx,monica.becerra@anam.gob.mx,anahi.santiago@anam.gob.mx";
+const para = "jorge.silva@anam.gob.mx";
+
+const cc = "vyc.altamira@anam.gob.mx,alejandra.munoz@anam.gob.mx,nayely.chavez@anam.gob.mx,miguel.herrera@anam.gob.mx,abraham.gomez@anam.gob.mx,daniel.santosh@anam.gob.mx,christian.monrreal@anam.gob.mx,monica.becerra@anam.gob.mx,anahi.santiago@anam.gob.mx";
 
 const asunto = datosCorreo.operacion + " - " + datosCorreo.tipo;
 
@@ -191,25 +192,43 @@ const cuerpo =
 "Placas:\r\n" + datosCorreo.placas +
 (datosCorreo.mercancia ? "\r\n\r\nMercancía:\r\n" + datosCorreo.mercancia : "");
 
-if (metodo === "app") {
-
-window.location.href =
-"mailto:" + principal +
-"?cc=" + encodeURIComponent(copia) +
+const mailtoLink =
+"mailto:" + para +
+"?cc=" + cc +
 "&subject=" + encodeURIComponent(asunto) +
 "&body=" + encodeURIComponent(cuerpo);
+
+const webLink =
+"https://outlook.office.com/mail/?path=/mail/action/compose" +
+"&to=" + encodeURIComponent(para) +
+"&cc=" + encodeURIComponent(cc) +
+"&subject=" + encodeURIComponent(asunto) +
+"&body=" + encodeURIComponent(cuerpo);
+
+
+/* ===========================
+   LÓGICA HÍBRIDA INTELIGENTE
+   =========================== */
+
+if (metodo === "app") {
+
+    // Intentar abrir app escritorio
+    window.location.href = mailtoLink;
+
+    // Si después de 1.5 segundos sigue en la misma página,
+    // abrir versión web automáticamente
+    setTimeout(function () {
+        window.location.href = webLink;
+    }, 1500);
 
 } else {
 
-window.location.href =
-"https://outlook.office.com/mail/?path=/mail/action/compose" +
-"&to=" + encodeURIComponent(principal) +
-"&cc=" + encodeURIComponent(copia) +
-"&subject=" + encodeURIComponent(asunto) +
-"&body=" + encodeURIComponent(cuerpo);
+    // Forzar apertura web
+    window.location.href = webLink;
 }
 
 cerrarModal();
+}
 document.getElementById("formRetorno").reset();
 inicializarFolio();
 }
@@ -222,5 +241,6 @@ document.getElementById("selectorModal").style.display = "none";
 
 </body>
 </html>
+
 
 
