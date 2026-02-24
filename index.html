@@ -26,7 +26,7 @@ button { background-color: #6A0F49; color: white; padding: 12px; border: none; w
 
 <div class="container" id="container">
 <div class="header">
-<h2 id="titulo">Formulario Institucional de Retorno</h2>
+<h2>Formulario Institucional de Retorno</h2>
 </div>
 
 <div class="info" id="infoBox">
@@ -115,12 +115,12 @@ new Date().toLocaleString();
 
 inicializarFolio();
 
-/* 🔠 Convertir placas automáticamente a MAYÚSCULAS */
+/* Placas en MAYÚSCULAS */
 document.getElementById("placas").addEventListener("input", function() {
 this.value = this.value.toUpperCase();
 });
 
-/* 🎨 Cambiar color según tipo de operación */
+/* Cambiar color según operación */
 document.getElementById("operacion").addEventListener("change", function() {
 
 const container = document.getElementById("container");
@@ -138,7 +138,6 @@ else {
 container.style.borderTop = "8px solid #6A0F49";
 infoBox.style.borderLeft = "4px solid #6A0F49";
 }
-
 });
 
 document.getElementById("tipo").addEventListener("change", function() {
@@ -152,7 +151,6 @@ document.getElementById("formRetorno")
 
 e.preventDefault();
 
-/* 🔒 Validar que seleccionó Importación o Exportación */
 const operacion = document.getElementById("operacion");
 if (operacion.value === "") {
 alert("Debe seleccionar Importación o Exportación.");
@@ -178,7 +176,6 @@ document.getElementById("selectorModal").style.display = "block";
 function enviarCorreo(metodo) {
 
 const principal = "jorge.silva@anam.gob.mx";
-
 const copia = "vyc.altamira@anam.gob.mx,alejandra.munoz@anam.gob.mx,nayely.chavez@anam.gob.mx,miguel.herrera@anam.gob.mx,abraham.gomez@anam.gob.mx,daniel.santosh@anam.gob.mx,christian.monrreal@anam.gob.mx,monica.becerra@anam.gob.mx,anahi.santiago@anam.gob.mx";
 
 const asunto = datosCorreo.operacion + " - " + datosCorreo.tipo;
@@ -194,26 +191,23 @@ const cuerpo =
 
 if (metodo === "app") {
 
-    // Outlook escritorio
-    window.location.href =
-    "mailto:" + principal +
-    "?cc=" + encodeURIComponent(copia) +
-    "&subject=" + encodeURIComponent(asunto) +
-    "&body=" + encodeURIComponent(cuerpo);
+window.location.href =
+"mailto:" + principal +
+"?cc=" + encodeURIComponent(copia) +
+"&subject=" + encodeURIComponent(asunto) +
+"&body=" + encodeURIComponent(cuerpo);
 
 } else {
 
-    // Outlook Web (ruta correcta y actual)
-    window.location.href =
-    "https://outlook.office.com/mail/?path=/mail/action/compose" +
-    "&to=" + encodeURIComponent(principal) +
-    "&cc=" + encodeURIComponent(copia) +
-    "&subject=" + encodeURIComponent(asunto) +
-    "&body=" + encodeURIComponent(cuerpo);
+window.location.href =
+"https://outlook.office.com/mail/?path=/mail/action/compose" +
+"&to=" + encodeURIComponent(principal) +
+"&cc=" + encodeURIComponent(copia) +
+"&subject=" + encodeURIComponent(asunto) +
+"&body=" + encodeURIComponent(cuerpo);
 }
 
 cerrarModal();
-}
 document.getElementById("formRetorno").reset();
 inicializarFolio();
 }
@@ -226,4 +220,3 @@ document.getElementById("selectorModal").style.display = "none";
 
 </body>
 </html>
-
