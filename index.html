@@ -58,44 +58,18 @@ button:hover { background-color: #4e0b36; }
 
 .hidden { display: none; }
 
-/* Modal */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background: white;
-    padding: 25px;
-    border-radius: 8px;
-    width: 300px;
-    text-align: center;
-    box-shadow: 0 0 20px rgba(0,0,0,0.2);
-}
-
-.modal-content h3 {
+/* Opciones de envío */
+.opciones-envio {
+    background: #f7f7f7;
+    padding: 15px;
+    border-radius: 6px;
     margin-bottom: 20px;
-    color: #6A0F49;
 }
 
-.modal-content button {
-    margin-bottom: 10px;
-}
-
-.cancelar {
-    background-color: #999;
-}
-
-.cancelar:hover {
-    background-color: #777;
+.opciones-envio label {
+    font-weight: normal;
+    display: block;
+    margin-bottom: 8px;
 }
 </style>
 </head>
@@ -116,7 +90,7 @@ button:hover { background-color: #4e0b36; }
     <form id="formRetorno">
 
         <label>Nombre del Operador en Turno:</label>
-        <input type="text" id="operador" placeholder="Ingrese su nombre completo" required>
+        <input type="text" id="operador" required>
 
         <label>Operación:</label>
         <select id="operacion" required>
@@ -136,25 +110,31 @@ button:hover { background-color: #4e0b36; }
         </select>
 
         <label>Placa(s) del vehículo:</label>
-        <textarea id="placas" placeholder="Ej: ABC-123, XYZ-789" required></textarea>
+        <textarea id="placas" required></textarea>
 
         <div id="mercanciaDiv" class="hidden">
             <label>Tipo de Mercancía / Descripción:</label>
             <textarea id="mercancia"></textarea>
         </div>
 
-        <button type="submit">Generar Correo de Retorno</button>
-    </form>
-</div>
+        <!-- OPCIÓN DE ENVÍO -->
+        <div class="opciones-envio">
+            <strong>Método de envío:</strong><br><br>
 
-<!-- Modal -->
-<div id="modalEnvio" class="modal hidden">
-    <div class="modal-content">
-        <h3>Seleccione método de envío</h3>
-        <button type="button" id="btnWeb">🌐 Outlook Web</button>
-        <button type="button" id="btnApp">📱 Aplicación del celular</button>
-        <button type="button" id="btnCancelar" class="cancelar">Cancelar</button>
-    </div>
+            <label>
+                <input type="radio" name="metodoEnvio" value="web" required>
+                🌐 Outlook Web
+            </label>
+
+            <label>
+                <input type="radio" name="metodoEnvio" value="app">
+                📱 Aplicación del celular
+            </label>
+        </div>
+
+        <button type="submit">Generar Correo de Retorno</button>
+
+    </form>
 </div>
 
 <script>
@@ -202,8 +182,6 @@ document.getElementById("tipo").addEventListener("change", function() {
         this.value !== "Solicitud de Revisión De Mercancía Sobre-Dimensionada");
 });
 
-let enlaceGenerado = {};
-
 document.getElementById("formRetorno").addEventListener("submit", function(e) {
     e.preventDefault();
 
@@ -214,6 +192,8 @@ document.getElementById("formRetorno").addEventListener("submit", function(e) {
         .replace(/,/g, '\n')
         .replace(/\s+/g, '\n');
     const mercancia = document.getElementById("mercancia").value.trim();
+    const metodo = document.querySelector('input[name="metodoEnvio"]:checked').value;
+
     const folio = generarFolio();
 
     let cuerpo = `FOLIO: ${folio}
@@ -237,32 +217,19 @@ ${mercancia}`;
 
     const asunto = `${operacion} - ${tipo}`;
 
-    enlaceGenerado.web =
-        `https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(destinatarios)}&subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+    let enlace;
 
-    enlaceGenerado.app =
-        `mailto:${destinatarios}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+    if (metodo === "web") {
+        enlace = `https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(destinatarios)}&subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+        window.open(enlace, '_blank');
+    } else {
+        enlace = `mailto:${destinatarios}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+        window.location.href = enlace;
+    }
 
-    document.getElementById("modalEnvio").classList.remove("hidden");
-});
-
-document.getElementById("btnWeb").addEventListener("click", function() {
-    window.open(enlaceGenerado.web, '_blank');
-    cerrarModal();
-});
-
-document.getElementById("btnApp").addEventListener("click", function() {
-    window.location.href = enlaceGenerado.app;
-    cerrarModal();
-});
-
-document.getElementById("btnCancelar").addEventListener("click", cerrarModal);
-
-function cerrarModal() {
-    document.getElementById("modalEnvio").classList.add("hidden");
-    document.getElementById("formRetorno").reset();
+    this.reset();
     inicializarFolio();
-}
+});
 </script>
 
 </body>
